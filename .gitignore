@@ -20,3 +20,10 @@ frontend/.flutter-plugins-dependencies
 
 # OS
 .DS_Store
+
+# AI agent tooling — machine-local, excluded from the project
+# installed skills (superpowers / understand-anything / agentmemory)
+/.claude/
+/skills-lock.json
+# agentmemory / iii local memory store (folder-bound)
+/data/
