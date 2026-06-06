@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import 'app/app_shell.dart';
 import 'core/theme.dart';
+import 'features/auth/login_screen.dart';
 
 void main() => runApp(const GrowAntApp());
 
@@ -14,7 +14,7 @@ class GrowAntApp extends StatelessWidget {
       title: 'GrowAnt',
       debugShowCheckedModeBanner: false,
       theme: growAntTheme(),
-      home: const AppShell(),
+      home: const LoginScreen(),
     );
   }
 }
