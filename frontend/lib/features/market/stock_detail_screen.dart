@@ -4,6 +4,8 @@ import 'package:intl/intl.dart';
 import '../../core/theme.dart';
 import '../../data/mock/mock_data.dart';
 
+// TODO(market-slice): Stock 객체 주입 → {required String ticker}로 변경.
+//   ref.watch(stockDetailProvider(ticker)).when(...)로 로드, 가격/등락/캔들/펀더멘털은 서버 StockDetail 사용. 스펙 §4.5
 class StockDetailScreen extends StatefulWidget {
   final Stock stock;
   const StockDetailScreen({super.key, required this.stock});
@@ -13,6 +15,8 @@ class StockDetailScreen extends StatefulWidget {
 }
 
 class _StockDetailScreenState extends State<StockDetailScreen> {
+  // NOTE(market-slice): _OrderSheet(매수/매도)는 mock 유지 — 거래(trading) 슬라이스에서 실연동.
+  //   이번 슬라이스는 마켓 '데이터'만 연결한다. 스펙 §1
   void _showOrderSheet(BuildContext context, bool isBuy) {
     showModalBottomSheet(
       context: context,
@@ -60,6 +64,7 @@ class _StockDetailScreenState extends State<StockDetailScreen> {
           const Text('가격 추이 (최근 10일)',
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
           const SizedBox(height: 12),
+          // TODO(market-slice): 전역 mockCandleClose(모든 종목 동일=버그) → detail.candles(종목별)로 교체. 스펙 §3.2/§4.5
           _MiniChart(prices: mockCandleClose),
           const SizedBox(height: 24),
           _InfoRow(label: '52주 최고', value: '${fmt.format((stock.price * 1.18).round())}원'),
