@@ -10,7 +10,9 @@ class DividendScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final fmt = NumberFormat('#,###');
 
-    return ListView(
+    return Scaffold(
+      appBar: AppBar(title: const Text('배당금 일정')),
+      body: ListView(
       padding: const EdgeInsets.all(16),
       children: [
         Container(
@@ -43,6 +45,7 @@ class DividendScreen extends StatelessWidget {
         for (final d in mockDividends)
           _DividendCard(event: d, fmt: fmt),
       ],
+      ),
     );
   }
 }
