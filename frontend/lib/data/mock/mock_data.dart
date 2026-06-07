@@ -72,6 +72,9 @@ const String mockUserTier = 'Standard'; // Free / Standard / Premium
 const String mockUserEmail = 'gsmin5202@gmail.com';
 
 // ── 마켓 ──
+// TODO(market-slice): mockMarket·mockCandleClose는 백엔드 API로 대체 예정.
+//   목록 → marketListProvider(GET /api/market), 캔들 → 종목별 detail.candles(GET /api/market/{ticker}).
+//   백엔드가 동일 8종목 카탈로그를 소유(결정적 스냅샷). 스펙 §3.2 / §4.5
 const List<Stock> mockMarket = [
   Stock('005930', '삼성전자', 76300, 5.97),
   Stock('000660', 'SK하이닉스', 178500, 3.41),

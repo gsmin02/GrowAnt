@@ -13,6 +13,8 @@ class MarketDashboardScreen extends StatefulWidget {
 }
 
 class _MarketDashboardScreenState extends State<MarketDashboardScreen> {
+  // TODO(market-slice): mockMarket 대신 ref.watch(marketListProvider).when(loading 스피너 / error: ErrorView / data)로 바인딩.
+  //   ConsumerStatefulWidget으로 전환, 검색 필터·상승/하락 집계 로직은 유지. 스펙 §4.5
   String _query = '';
 
   List<Stock> get _filtered => mockMarket
@@ -109,6 +111,7 @@ class _StockTile extends StatelessWidget {
     final isUp = stock.changeRate >= 0;
     return ListTile(
       contentPadding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+      // TODO(market-slice): StockDetailScreen(stock:) → StockDetailScreen(ticker: stock.ticker) (상세는 ticker로 재조회). 스펙 §4.5
       onTap: () => Navigator.push(
         context,
         MaterialPageRoute(builder: (_) => StockDetailScreen(stock: stock)),

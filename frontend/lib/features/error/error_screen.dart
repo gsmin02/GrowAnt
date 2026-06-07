@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+// TODO(market-slice): serviceUnavailable 추가 (+ 아래 _configs 항목 동반 필수 — 없으면 _configs[type]!/갤러리 순회 크래시). 스펙 §5/C3
 enum ErrorType { network, serverError, notFound, unauthorized }
 
 class ErrorScreen extends StatelessWidget {
@@ -39,6 +40,8 @@ class ErrorScreen extends StatelessWidget {
     ),
   };
 
+  // TODO(market-slice): Scaffold 없는 ErrorView 위젯으로 본문 추출(탭 본문 임베드용). ErrorScreen은 ErrorView를 Scaffold로 감싸 위임.
+  //   ErrorView(eventType, message(서버값), retryable, onRetry): eventType→프리셋(아이콘/제목), 메시지·재시도는 서버 envelope 사용. 스펙 §4.1/§5
   @override
   Widget build(BuildContext context) {
     final config = _configs[type]!;
