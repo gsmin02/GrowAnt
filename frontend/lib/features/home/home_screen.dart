@@ -5,6 +5,7 @@ import '../../core/theme.dart';
 import '../../data/mock/mock_data.dart';
 import '../ai/ai_feedback_screen.dart';
 import '../ai/psychology_screen.dart';
+import '../market/stock_detail_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -261,34 +262,43 @@ class _StockRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final fmt = NumberFormat('#,###');
     final isUp = stock.changeRate >= 0;
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      child: Row(
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+    return InkWell(
+      onTap: () => Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => StockDetailScreen(ticker: stock.ticker)),
+      ),
+      borderRadius: BorderRadius.circular(8),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8),
+        child: Row(
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(stock.name,
+                      style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
+                  Text(stock.ticker,
+                      style: const TextStyle(color: Color(0xFF999999), fontSize: 12)),
+                ],
+              ),
+            ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                Text(stock.name,
-                    style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
-                Text(stock.ticker,
-                    style: const TextStyle(color: Color(0xFF999999), fontSize: 12)),
+                Text('${fmt.format(stock.price)}원',
+                    style: const TextStyle(fontWeight: FontWeight.w600)),
+                Text(
+                  '${isUp ? '+' : ''}${stock.changeRate.toStringAsFixed(2)}%',
+                  style: TextStyle(
+                      color: isUp ? upColor : downColor, fontSize: 13, fontWeight: FontWeight.w500),
+                ),
               ],
             ),
-          ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Text('${fmt.format(stock.price)}원',
-                  style: const TextStyle(fontWeight: FontWeight.w600)),
-              Text(
-                '${isUp ? '+' : ''}${stock.changeRate.toStringAsFixed(2)}%',
-                style: TextStyle(
-                    color: isUp ? upColor : downColor, fontSize: 13, fontWeight: FontWeight.w500),
-              ),
-            ],
-          ),
-        ],
+            const SizedBox(width: 4),
+            const Icon(Icons.chevron_right, size: 18, color: Color(0xFFCCCCCC)),
+          ],
+        ),
       ),
     );
   }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../data/mock/mock_data.dart';
+import 'feedback_detail_screen.dart';
 
 class AiFeedbackScreen extends StatelessWidget {
   const AiFeedbackScreen({super.key});
@@ -90,7 +91,12 @@ class _FeedbackCard extends StatelessWidget {
     final color = _colors[item.category] ?? const Color(0xFF111111);
     final icon = _icons[item.category] ?? Icons.info_outline;
 
-    return Container(
+    return GestureDetector(
+      onTap: () => Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => FeedbackDetailScreen(item: item)),
+      ),
+      child: Container(
       margin: const EdgeInsets.only(bottom: 10),
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
@@ -127,7 +133,9 @@ class _FeedbackCard extends StatelessWidget {
               ],
             ),
           ),
+          const Icon(Icons.chevron_right, size: 18, color: Color(0xFFCCCCCC)),
         ],
+      ),
       ),
     );
   }
