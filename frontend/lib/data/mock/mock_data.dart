@@ -72,9 +72,8 @@ const String mockUserTier = 'Standard'; // Free / Standard / Premium
 const String mockUserEmail = 'gsmin5202@gmail.com';
 
 // ── 마켓 ──
-// TODO(market-slice): mockMarket·mockCandleClose는 백엔드 API로 대체 예정.
-//   목록 → marketListProvider(GET /api/market), 캔들 → 종목별 detail.candles(GET /api/market/{ticker}).
-//   백엔드가 동일 8종목 카탈로그를 소유(결정적 스냅샷). 스펙 §3.2 / §4.5
+// market-slice: 마켓 대시보드는 marketListProvider(GET /api/market)로 이전 완료.
+//   mockMarket은 home_screen(상위 3종목)에서 아직 사용 — 추후 home도 API로. 스펙 §4.5
 const List<Stock> mockMarket = [
   Stock('005930', '삼성전자', 76300, 5.97),
   Stock('000660', 'SK하이닉스', 178500, 3.41),
@@ -85,9 +84,6 @@ const List<Stock> mockMarket = [
   Stock('068270', '셀트리온', 187000, -1.24),
   Stock('051910', 'LG화학', 278000, 2.08),
 ];
-
-// 종목 상세 — 일봉 (단가 기준 인덱스: 0=최근)
-const List<int> mockCandleClose = [76300, 74100, 75500, 72800, 73900, 71500, 72200, 70000, 71300, 69800];
 
 // ── 거래 내역 ──
 const List<Trade> mockTrades = [
