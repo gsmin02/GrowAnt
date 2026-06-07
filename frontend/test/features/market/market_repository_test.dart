@@ -33,8 +33,8 @@ void main() {
           'success': false,
           'error': {'code': 'INVALID_TICKER', 'eventType': 'VALIDATION_ERROR', 'message': '존재하지 않는 종목입니다.', 'retryable': false}
         }));
-    expect(
-      () => repo.fetchDetail('999999'),
+    await expectLater(
+      repo.fetchDetail('999999'),
       throwsA(isA<ApiException>()
           .having((e) => e.eventType, 'eventType', 'VALIDATION_ERROR')
           .having((e) => e.retryable, 'retryable', false)),
