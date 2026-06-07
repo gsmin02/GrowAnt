@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 
 import '../../core/theme.dart';
 import '../../data/mock/mock_data.dart';
+import 'trade_detail_screen.dart';
 
 class TradeHistoryScreen extends StatelessWidget {
   const TradeHistoryScreen({super.key});
@@ -95,6 +96,10 @@ class _TradeTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListTile(
       contentPadding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+      onTap: () => Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => TradeDetailScreen(trade: trade)),
+      ),
       leading: Container(
         width: 40,
         height: 40,
