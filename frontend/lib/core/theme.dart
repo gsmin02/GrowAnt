@@ -1,22 +1,27 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
-/// 흑백 중심 + 개미 모티프 톤 (8주차: 메인 컬러 #000 / #FFF).
+/// 흑백 중심 + 개미 모티프 톤. 본문/상단 폰트: Noto Sans KR (한글 가독성).
 ThemeData growAntTheme() {
   final scheme = ColorScheme.fromSeed(
     seedColor: const Color(0xFF111111),
     brightness: Brightness.light,
   );
-  return ThemeData(
-    useMaterial3: true,
-    colorScheme: scheme,
+  final base = ThemeData(useMaterial3: true, colorScheme: scheme);
+  return base.copyWith(
     scaffoldBackgroundColor: const Color(0xFFF5F5F5),
-    appBarTheme: const AppBarTheme(
-      backgroundColor: Color(0xFFF5F5F5),
-      foregroundColor: Color(0xFF111111),
+    textTheme: GoogleFonts.notoSansKrTextTheme(base.textTheme),
+    appBarTheme: AppBarTheme(
+      backgroundColor: const Color(0xFFF5F5F5),
+      foregroundColor: const Color(0xFF111111),
       elevation: 0,
       centerTitle: false,
+      titleTextStyle: GoogleFonts.notoSansKr(
+        color: const Color(0xFF111111),
+        fontSize: 18,
+        fontWeight: FontWeight.w700,
+      ),
     ),
-    // TODO: 제주고딕/프리텐다드 폰트 추가 (8주차 결정)
   );
 }
 
