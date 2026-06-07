@@ -9,6 +9,7 @@ import 'application/market_providers.dart';
 import 'data/market_models.dart';
 import 'stock_info_screen.dart';
 import 'widgets/candle_chart.dart';
+import 'widgets/line_chart.dart';
 import 'widgets/order_book.dart';
 
 class StockDetailScreen extends ConsumerWidget {
@@ -76,34 +77,51 @@ class _DetailBody extends StatelessWidget {
           child: ListView(
             padding: const EdgeInsets.all(16),
             children: [
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Text('${fmt.format(detail.price)}원',
-                      style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold)),
-                  const SizedBox(width: 8),
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 4),
-                    child: Text('${isUp ? '+' : ''}${detail.changeRate.toStringAsFixed(2)}%',
-                        style: TextStyle(
-                            color: isUp ? upColor : downColor,
-                            fontWeight: FontWeight.w600,
-                            fontSize: 16)),
-                  ),
-                ],
+              // 가격 요약 (흰색 카드)
+              _SectionCard(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Text('${fmt.format(detail.price)}원',
+                            style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold)),
+                        const SizedBox(width: 8),
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 4),
+                          child: Text('${isUp ? '+' : ''}${detail.changeRate.toStringAsFixed(2)}%',
+                              style: TextStyle(
+                                  color: isUp ? upColor : downColor,
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 16)),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 4),
+                    Text(detail.ticker,
+                        style: const TextStyle(color: Color(0xFF999999), fontSize: 13)),
+                  ],
+                ),
               ),
-              const SizedBox(height: 4),
-              Text(detail.ticker,
-                  style: const TextStyle(color: Color(0xFF999999), fontSize: 13)),
-              const SizedBox(height: 24),
-              const Text('일봉 차트 (최근 10일)',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
-              const SizedBox(height: 12),
-              CandleChart(closes: detail.candles, seed: detail.ticker.hashCode),
-              const SizedBox(height: 24),
-              const Text('호가', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
-              const SizedBox(height: 12),
-              OrderBook(price: detail.price, seed: detail.ticker.hashCode),
+              // 차트 (옅은 파란 카드) — 라인/캔들 토글
+              _SectionCard(
+                color: const Color(0xFFF1F5FB),
+                child: _ChartSection(detail: detail),
+              ),
+              // 호가 (옅은 회색 카드)
+              _SectionCard(
+                color: const Color(0xFFFAFAFA),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text('호가',
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                    const SizedBox(height: 12),
+                    OrderBook(price: detail.price, seed: detail.ticker.hashCode),
+                  ],
+                ),
+              ),
             ],
           ),
         ),
@@ -123,6 +141,72 @@ class _DetailBody extends StatelessWidget {
             ),
           ),
         ),
+      ],
+    );
+  }
+}
+
+/// 섹션 구분용 카드 (배경색 지정).
+class _SectionCard extends StatelessWidget {
+  final Widget child;
+  final Color color;
+  const _SectionCard({required this.child, this.color = Colors.white});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: color,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: const Color(0xFFEAEAEA)),
+      ),
+      child: child,
+    );
+  }
+}
+
+enum _ChartType { candle, line }
+
+/// 라인/캔들 토글 + 선택된 차트 렌더.
+class _ChartSection extends StatefulWidget {
+  final StockDetail detail;
+  const _ChartSection({required this.detail});
+
+  @override
+  State<_ChartSection> createState() => _ChartSectionState();
+}
+
+class _ChartSectionState extends State<_ChartSection> {
+  _ChartType _type = _ChartType.candle;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            const Text('차트 (최근 10일)',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+            const Spacer(),
+            SegmentedButton<_ChartType>(
+              showSelectedIcon: false,
+              segments: const [
+                ButtonSegment(value: _ChartType.candle, label: Text('캔들')),
+                ButtonSegment(value: _ChartType.line, label: Text('라인')),
+              ],
+              selected: {_type},
+              onSelectionChanged: (s) => setState(() => _type = s.first),
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        _type == _ChartType.candle
+            ? CandleChart(closes: widget.detail.candles, seed: widget.detail.ticker.hashCode)
+            : LineChart(closes: widget.detail.candles),
       ],
     );
   }

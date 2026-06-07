@@ -16,11 +16,11 @@ int tickSize(int price) {
   return 1000;
 }
 
-/// Mock 호가창: 현재가 ± 호가단위로 매도 5단(위)·매수 5단(아래) + mock 잔량.
-/// (백엔드 호가 데이터 없음 — 실시간 연동 시 입력만 교체.)
+/// Mock 호가: 현재가 ± 호가단위로 매도 5단(위)·매수 5단(아래) + mock 잔량.
+/// 자체 배경 없이 호출부 섹션 카드 안에 배치된다.
 class OrderBook extends StatelessWidget {
   final int price;
-  final int seed; // 종목별 결정적 잔량 시드
+  final int seed;
   const OrderBook({super.key, required this.price, required this.seed});
 
   @override
@@ -29,12 +29,10 @@ class OrderBook extends StatelessWidget {
     final tick = tickSize(price);
     final rnd = Random(seed);
 
-    // 매도호가: 높은 가격이 위 (price+5tick ... price+1tick)
     final asks = <(int, int)>[];
     for (var i = 5; i >= 1; i--) {
       asks.add((price + tick * i, 100 + rnd.nextInt(900)));
     }
-    // 매수호가: price-1tick ... price-5tick
     final bids = <(int, int)>[];
     for (var i = 1; i <= 5; i++) {
       bids.add((price - tick * i, 100 + rnd.nextInt(900)));
@@ -42,35 +40,25 @@ class OrderBook extends StatelessWidget {
     final maxQty =
         [...asks.map((e) => e.$2), ...bids.map((e) => e.$2)].reduce(max);
 
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFFEEEEEE)),
-      ),
-      child: Column(
-        children: [
-          // 매도호가 = 파랑(한국 호가창 관습)
-          for (final a in asks)
-            _Level(price: a.$1, qty: a.$2, maxQty: maxQty, color: downColor, fmt: fmt),
-          const Divider(height: 14),
-          Row(
-            children: [
-              const Spacer(),
-              Text('현재가 ${fmt.format(price)}원',
-                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
-            ],
-          ),
-          const Divider(height: 14),
-          // 매수호가 = 빨강
-          for (final b in bids)
-            _Level(price: b.$1, qty: b.$2, maxQty: maxQty, color: upColor, fmt: fmt),
-          const SizedBox(height: 6),
-          const Text('* Mock 호가 — 실시간 연동 시 대체',
-              style: TextStyle(color: Color(0xFFAAAAAA), fontSize: 11)),
-        ],
-      ),
+    return Column(
+      children: [
+        for (final a in asks)
+          _Level(price: a.$1, qty: a.$2, maxQty: maxQty, color: downColor, fmt: fmt),
+        const Divider(height: 14),
+        Row(
+          children: [
+            const Spacer(),
+            Text('현재가 ${fmt.format(price)}원',
+                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+          ],
+        ),
+        const Divider(height: 14),
+        for (final b in bids)
+          _Level(price: b.$1, qty: b.$2, maxQty: maxQty, color: upColor, fmt: fmt),
+        const SizedBox(height: 6),
+        const Text('* Mock 호가 — 실시간 연동 시 대체',
+            style: TextStyle(color: Color(0xFFAAAAAA), fontSize: 11)),
+      ],
     );
   }
 }
