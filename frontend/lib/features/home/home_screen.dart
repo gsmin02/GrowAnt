@@ -5,6 +5,7 @@ import '../../core/theme.dart';
 import '../../data/mock/mock_data.dart';
 import '../ai/ai_feedback_screen.dart';
 import '../ai/psychology_screen.dart';
+import '../duel/portfolio_detail_screen.dart';
 import '../market/stock_detail_screen.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -56,12 +57,43 @@ class HomeScreen extends StatelessWidget {
               const SizedBox(height: 12),
               Row(
                 children: [
-                  Expanded(child: _DuelStat(label: '나', value: mockMyReturn, isMe: true)),
+                  Expanded(
+                    child: _DuelStat(
+                      label: '나',
+                      value: mockMyReturn,
+                      isMe: true,
+                      onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const PortfolioDetailScreen(
+                            title: '내 포트폴리오',
+                            holdings: mockMyHoldings,
+                            isAi: false,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
                   const SizedBox(width: 8),
                   const Text('VS', style: TextStyle(fontWeight: FontWeight.bold)),
                   const SizedBox(width: 8),
                   Expanded(
-                      child: _DuelStat(label: '대결 AI', value: mockAiReturn, isMe: false)),
+                    child: _DuelStat(
+                      label: '대결 AI',
+                      value: mockAiReturn,
+                      isMe: false,
+                      onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const PortfolioDetailScreen(
+                            title: 'AI 포트폴리오',
+                            holdings: mockAiHoldings,
+                            isAi: true,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
                 ],
               ),
               const SizedBox(height: 12),
@@ -194,12 +226,13 @@ class _DuelStat extends StatelessWidget {
   final String label;
   final double value;
   final bool isMe;
-  const _DuelStat({required this.label, required this.value, required this.isMe});
+  final VoidCallback? onTap;
+  const _DuelStat({required this.label, required this.value, required this.isMe, this.onTap});
 
   @override
   Widget build(BuildContext context) {
     final isUp = value >= 0;
-    return Container(
+    final content = Container(
       padding: const EdgeInsets.symmetric(vertical: 12),
       decoration: BoxDecoration(
         color: isMe ? const Color(0xFFF5F5F5) : Colors.white,
@@ -208,7 +241,16 @@ class _DuelStat extends StatelessWidget {
       ),
       child: Column(
         children: [
-          Text(label, style: const TextStyle(fontSize: 13, color: Color(0xFF666666))),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(label, style: const TextStyle(fontSize: 13, color: Color(0xFF666666))),
+              if (onTap != null) ...[
+                const SizedBox(width: 2),
+                const Icon(Icons.chevron_right, size: 15, color: Color(0xFFBBBBBB)),
+              ],
+            ],
+          ),
           const SizedBox(height: 4),
           Text(
             '${isUp ? '+' : ''}${value.toStringAsFixed(1)}%',
@@ -221,6 +263,8 @@ class _DuelStat extends StatelessWidget {
         ],
       ),
     );
+    if (onTap == null) return content;
+    return InkWell(onTap: onTap, borderRadius: BorderRadius.circular(8), child: content);
   }
 }
 
