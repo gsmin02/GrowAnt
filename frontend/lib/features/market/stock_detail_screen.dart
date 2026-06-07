@@ -192,14 +192,9 @@ class _ChartSectionState extends State<_ChartSection> {
             const Text('차트 (최근 10일)',
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
             const Spacer(),
-            SegmentedButton<_ChartType>(
-              showSelectedIcon: false,
-              segments: const [
-                ButtonSegment(value: _ChartType.candle, label: Text('캔들')),
-                ButtonSegment(value: _ChartType.line, label: Text('라인')),
-              ],
-              selected: {_type},
-              onSelectionChanged: (s) => setState(() => _type = s.first),
+            _ChartToggle(
+              type: _type,
+              onChanged: (t) => setState(() => _type = t),
             ),
           ],
         ),
@@ -208,6 +203,59 @@ class _ChartSectionState extends State<_ChartSection> {
             ? CandleChart(closes: widget.detail.candles, seed: widget.detail.ticker.hashCode)
             : LineChart(closes: widget.detail.candles),
       ],
+    );
+  }
+}
+
+/// 모던 아이콘 세그먼트 토글 (iOS 스타일) — 캔들 / 라인.
+class _ChartToggle extends StatelessWidget {
+  final _ChartType type;
+  final ValueChanged<_ChartType> onChanged;
+  const _ChartToggle({required this.type, required this.onChanged});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(3),
+      decoration: BoxDecoration(
+        color: const Color(0xFFEDEDED),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          _seg(_ChartType.candle, Icons.candlestick_chart, '캔들'),
+          _seg(_ChartType.line, Icons.show_chart, '라인'),
+        ],
+      ),
+    );
+  }
+
+  Widget _seg(_ChartType t, IconData icon, String tooltip) {
+    final selected = type == t;
+    return GestureDetector(
+      onTap: () => onChanged(t),
+      child: Tooltip(
+        message: tooltip,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 160),
+          curve: Curves.easeOut,
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 7),
+          decoration: BoxDecoration(
+            color: selected ? Colors.white : Colors.transparent,
+            borderRadius: BorderRadius.circular(8),
+            boxShadow: selected
+                ? [
+                    BoxShadow(
+                        color: Colors.black.withAlpha(22),
+                        blurRadius: 4,
+                        offset: const Offset(0, 1)),
+                  ]
+                : null,
+          ),
+          child: Icon(icon, size: 19, color: selected ? inkColor : const Color(0xFF9E9E9E)),
+        ),
+      ),
     );
   }
 }
