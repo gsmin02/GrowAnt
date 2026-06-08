@@ -1,19 +1,11 @@
 /// Mock 데이터 — 백엔드 연동 전 UI 개발용. 추후 repository로 교체.
 
-class Stock {
-  final String ticker;
-  final String name;
-  final int price;
-  final double changeRate; // %
-  const Stock(this.ticker, this.name, this.price, this.changeRate);
-}
-
 class Holding {
   final String ticker;
   final String name;
   final int qty;
   final int avgPrice;     // 평균 매입 단가
-  final int currentPrice; // 현재가 (홈 mockMarket과 일치)
+  final int currentPrice; // 현재가 (홈 마켓 시세와 일치)
   const Holding(this.ticker, this.name, this.qty, this.avgPrice, this.currentPrice);
 }
 
@@ -97,20 +89,6 @@ const List<Holding> mockAiHoldings = [
 const String mockUserName = '민지성';
 const String mockUserTier = 'Standard'; // Free / Standard / Premium
 const String mockUserEmail = 'gsmin5202@gmail.com';
-
-// ── 마켓 ──
-// market-slice: 마켓 대시보드는 marketListProvider(GET /api/market)로 이전 완료.
-//   mockMarket은 home_screen(상위 3종목)에서 아직 사용 — 추후 home도 API로. 스펙 §4.5
-const List<Stock> mockMarket = [
-  Stock('005930', '삼성전자', 76300, 5.97),
-  Stock('000660', 'SK하이닉스', 178500, 3.41),
-  Stock('035720', '카카오', 41200, -2.10),
-  Stock('035420', 'NAVER', 198400, 1.55),
-  Stock('005380', '현대차', 247000, -0.81),
-  Stock('000270', '기아', 109500, 0.37),
-  Stock('068270', '셀트리온', 187000, -1.24),
-  Stock('051910', 'LG화학', 278000, 2.08),
-];
 
 // ── 거래 내역 ──
 const List<Trade> mockTrades = [

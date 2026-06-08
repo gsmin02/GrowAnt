@@ -6,7 +6,7 @@ import '../../data/mock/mock_data.dart';
 import '../ai/ai_feedback_screen.dart';
 import '../ai/psychology_screen.dart';
 import '../duel/portfolio_detail_screen.dart';
-import '../market/stock_detail_screen.dart';
+import 'widgets/watchlist_card.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -125,17 +125,7 @@ class HomeScreen extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 12),
-        _SectionCard(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text('관심 종목',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
-              const SizedBox(height: 8),
-              for (final s in mockMarket.take(3)) _StockRow(stock: s),
-            ],
-          ),
-        ),
+        const WatchlistCard(),
         const SizedBox(height: 12),
         Row(
           children: [
@@ -291,56 +281,6 @@ class _ShortcutCard extends StatelessWidget {
             const SizedBox(height: 6),
             Text(label,
                 style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _StockRow extends StatelessWidget {
-  final Stock stock;
-  const _StockRow({required this.stock});
-
-  @override
-  Widget build(BuildContext context) {
-    final fmt = NumberFormat('#,###');
-    final isUp = stock.changeRate >= 0;
-    return InkWell(
-      onTap: () => Navigator.push(
-        context,
-        MaterialPageRoute(builder: (_) => StockDetailScreen(ticker: stock.ticker)),
-      ),
-      borderRadius: BorderRadius.circular(8),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8),
-        child: Row(
-          children: [
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(stock.name,
-                      style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
-                  Text(stock.ticker,
-                      style: const TextStyle(color: Color(0xFF999999), fontSize: 12)),
-                ],
-              ),
-            ),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Text('${fmt.format(stock.price)}원',
-                    style: const TextStyle(fontWeight: FontWeight.w600)),
-                Text(
-                  '${isUp ? '+' : ''}${stock.changeRate.toStringAsFixed(2)}%',
-                  style: TextStyle(
-                      color: isUp ? upColor : downColor, fontSize: 13, fontWeight: FontWeight.w500),
-                ),
-              ],
-            ),
-            const SizedBox(width: 4),
-            const Icon(Icons.chevron_right, size: 18, color: Color(0xFFCCCCCC)),
           ],
         ),
       ),
