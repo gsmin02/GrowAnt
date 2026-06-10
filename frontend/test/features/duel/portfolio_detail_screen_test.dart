@@ -62,6 +62,12 @@ void main() {
     expect(find.text('내 포트폴리오'), findsOneWidget);
   });
 
+  testWidgets('로딩 중에는 스피너를 표시한다', (tester) async {
+    await tester.pumpWidget(_wrap(_FakeRepo(), PortfolioOwner.me));
+    expect(find.byType(CircularProgressIndicator), findsOneWidget);
+    await tester.pump(); // 보류된 future 정리
+  });
+
   testWidgets('에러 시 ErrorView를 표시한다', (tester) async {
     await tester.pumpWidget(_wrap(
         _FakeRepo(
@@ -71,5 +77,16 @@ void main() {
     await tester.pump();
     expect(find.byType(ErrorView), findsOneWidget);
     expect(find.widgetWithText(FilledButton, '다시 시도'), findsOneWidget);
+  });
+
+  testWidgets('retryable=false 에러는 재시도 버튼을 표시하지 않는다', (tester) async {
+    await tester.pumpWidget(_wrap(
+        _FakeRepo(
+            error: const ApiException(
+                eventType: 'AUTH_ERROR', code: 'UNAUTHENTICATED', message: '로그인이 필요합니다.', retryable: false)),
+        PortfolioOwner.me));
+    await tester.pump();
+    expect(find.byType(ErrorView), findsOneWidget);
+    expect(find.widgetWithText(FilledButton, '다시 시도'), findsNothing);
   });
 }
