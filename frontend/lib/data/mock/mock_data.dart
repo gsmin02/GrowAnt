@@ -1,14 +1,5 @@
 /// Mock 데이터 — 백엔드 연동 전 UI 개발용. 추후 repository로 교체.
 
-class Holding {
-  final String ticker;
-  final String name;
-  final int qty;
-  final int avgPrice;     // 평균 매입 단가
-  final int currentPrice; // 현재가 (홈 마켓 시세와 일치)
-  const Holding(this.ticker, this.name, this.qty, this.avgPrice, this.currentPrice);
-}
-
 class Trade {
   final String name;
   final bool isBuy;
@@ -62,28 +53,9 @@ class SubscriptionPlan {
 }
 
 // ── 홈 / 대결 ──
-const int mockAsset = 10520000;
+// mockDuelDDay: 대결 메타 — 대결 슬라이스에서 API 이전 예정.
 const int mockSeed = 10000000;
-const double mockMyReturn = 5.2;
-const double mockAiReturn = 3.8;
 const int mockDuelDDay = 18;
-
-// ── 대결 포트폴리오 (보유 종목 상세) ──
-// 합산 수익률은 홈 대결 수치와 일치: mockMyHoldings +5.2%, mockAiHoldings +3.8%.
-// AI는 마켓 카탈로그 8종목 내에서만 구성 → 따라사기 시 종목 상세 정상 로드.
-const List<Holding> mockMyHoldings = [
-  Holding('005930', '삼성전자', 12, 70000, 76300),
-  Holding('000660', 'SK하이닉스', 4, 185000, 178500),
-  Holding('035420', 'NAVER', 3, 189000, 198400),
-  Holding('000270', '기아', 6, 98700, 109500),
-];
-
-const List<Holding> mockAiHoldings = [
-  Holding('005930', '삼성전자', 8, 73500, 76300),
-  Holding('051910', 'LG화학', 3, 272000, 278000),
-  Holding('068270', '셀트리온', 5, 192000, 187000),
-  Holding('035720', '카카오', 20, 36110, 41200),
-];
 
 // ── 사용자 프로필 ──
 const String mockUserName = '민지성';
