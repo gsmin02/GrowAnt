@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 
 import '../../core/theme.dart';
 import '../../data/mock/mock_data.dart';
 import '../ai/ai_feedback_screen.dart';
 import '../ai/psychology_screen.dart';
 import '../duel/portfolio_detail_screen.dart';
+import 'widgets/asset_card.dart';
 import 'widgets/watchlist_card.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -13,40 +13,12 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final fmt = NumberFormat('#,###');
     final returnDiff = mockMyReturn - mockAiReturn;
 
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
-        _SectionCard(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Text(mockUserName,
-                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                  const SizedBox(width: 8),
-                  _TierChip(tier: mockUserTier),
-                ],
-              ),
-              const SizedBox(height: 16),
-              Text('총 평가 자산',
-                  style: Theme.of(context)
-                      .textTheme
-                      .bodySmall
-                      ?.copyWith(color: const Color(0xFF888888))),
-              const SizedBox(height: 4),
-              Text(
-                '${fmt.format(mockAsset)}원',
-                style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 4),
-              _ReturnBadge(rate: mockMyReturn),
-            ],
-          ),
-        ),
+        const AssetCard(),
         const SizedBox(height: 12),
         _SectionCard(
           child: Column(
@@ -172,42 +144,6 @@ class _SectionCard extends StatelessWidget {
         border: Border.all(color: const Color(0xFFEEEEEE)),
       ),
       child: child,
-    );
-  }
-}
-
-class _TierChip extends StatelessWidget {
-  final String tier;
-  const _TierChip({required this.tier});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-      decoration: BoxDecoration(
-        color: const Color(0xFF111111),
-        borderRadius: BorderRadius.circular(4),
-      ),
-      child: Text(tier,
-          style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w600)),
-    );
-  }
-}
-
-class _ReturnBadge extends StatelessWidget {
-  final double rate;
-  const _ReturnBadge({required this.rate});
-
-  @override
-  Widget build(BuildContext context) {
-    final isUp = rate >= 0;
-    return Text(
-      '${isUp ? '+' : ''}${rate.toStringAsFixed(2)}%',
-      style: TextStyle(
-        color: isUp ? upColor : downColor,
-        fontWeight: FontWeight.w600,
-        fontSize: 16,
-      ),
     );
   }
 }
