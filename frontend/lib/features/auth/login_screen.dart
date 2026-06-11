@@ -108,6 +108,13 @@ class _NicknameSheetState extends ConsumerState<_NicknameSheet> {
       setState(() => _submitting = false);
       messenger.showSnackBar(
           SnackBar(content: Text(e.message), duration: const Duration(seconds: 2)));
+    } catch (_) {
+      // 토큰 저장(Keychain) 등 비API 예외 — 버튼이 영구 비활성으로 남지 않게 복구한다.
+      if (!mounted) return;
+      setState(() => _submitting = false);
+      messenger.showSnackBar(const SnackBar(
+          content: Text('로그인에 실패했어요. 다시 시도해 주세요.'),
+          duration: Duration(seconds: 2)));
     }
   }
 
