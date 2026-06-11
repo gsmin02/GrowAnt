@@ -40,11 +40,12 @@ AI와 투자 대결하는 모의투자 앱 — 초보 투자자의 매매 타이
 # (백엔드 Dockerfile·dev 프로파일은 영속성 슬라이스에서 정비 예정 — 현재는 아래 '백엔드 단독' 사용)
 docker compose up -d
 
-# 백엔드 단독
-cd backend && ./gradlew bootRun
+# 백엔드 단독 (local 프로파일 — DB 불필요. 루트 .env가 있으면 자동 로드)
+cd backend && ./gradlew bootRun --args='--spring.profiles.active=local'
 
-# 프론트
-cd frontend && flutter pub get && flutter run
+# 프론트 — API 주소는 frontend/.env로 관리
+cd frontend && cp .env.example .env   # 최초 1회, 환경에 맞게 수정
+flutter pub get && flutter run --dart-define-from-file=.env
 ```
 
 시세는 현재 **시뮬레이션**(`MARKET_PROVIDER=sim`)으로 동작합니다. KIS 전환은 `MarketDataProvider` 구현 교체만으로 가능합니다.
