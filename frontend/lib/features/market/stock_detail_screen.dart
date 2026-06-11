@@ -11,6 +11,10 @@ import 'stock_info_screen.dart';
 import 'widgets/candle_chart.dart';
 import 'widgets/line_chart.dart';
 import 'widgets/order_book.dart';
+import '../account/application/account_providers.dart';
+import '../duel/application/portfolio_providers.dart';
+import '../duel/data/portfolio_models.dart';
+import '../trading/application/trading_providers.dart';
 
 class StockDetailScreen extends ConsumerWidget {
   final String ticker;
@@ -63,7 +67,8 @@ class _DetailBody extends StatelessWidget {
       isScrollControlled: true,
       shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
-      builder: (_) => _OrderSheet(name: detail.name, price: detail.price, isBuy: isBuy),
+      builder: (_) =>
+          _OrderSheet(ticker: detail.ticker, name: detail.name, price: detail.price, isBuy: isBuy),
     );
   }
 
@@ -277,18 +282,49 @@ class _OrderButton extends StatelessWidget {
       );
 }
 
-// NOTE(market-slice): _OrderSheet은 mock 유지 — 거래(trading) 슬라이스에서 실연동. 스펙 §1
-class _OrderSheet extends StatefulWidget {
+/// 주문 시트 — POST /api/orders 실연동. 성공 시 서버 상태(현금·보유·내역)가
+/// 변하므로 관련 provider를 invalidate해 홈/상세/내역을 갱신한다.
+class _OrderSheet extends ConsumerStatefulWidget {
+  final String ticker;
   final String name;
   final int price;
   final bool isBuy;
-  const _OrderSheet({required this.name, required this.price, required this.isBuy});
+  const _OrderSheet(
+      {required this.ticker, required this.name, required this.price, required this.isBuy});
   @override
-  State<_OrderSheet> createState() => _OrderSheetState();
+  ConsumerState<_OrderSheet> createState() => _OrderSheetState();
 }
 
-class _OrderSheetState extends State<_OrderSheet> {
+class _OrderSheetState extends ConsumerState<_OrderSheet> {
   int _qty = 1;
+  bool _submitting = false;
+
+  Future<void> _submit() async {
+    final messenger = ScaffoldMessenger.of(context);
+    final navigator = Navigator.of(context);
+    setState(() => _submitting = true);
+    try {
+      final trade = await ref
+          .read(tradeRepositoryProvider)
+          .placeOrder(ticker: widget.ticker, isBuy: widget.isBuy, qty: _qty);
+      ref.invalidate(portfolioProvider(PortfolioOwner.me));
+      ref.invalidate(accountSummaryProvider);
+      ref.invalidate(tradesProvider);
+      // 전송 중 시트를 스와이프로 닫았을 수 있음 — pop은 mounted일 때만(상세 화면 오닫힘 방지).
+      // 체결 자체는 완료됐으므로 스낵바(루트 messenger)는 항상 표시한다.
+      if (mounted) navigator.pop();
+      messenger.showSnackBar(SnackBar(
+        content: Text('${widget.isBuy ? '매수' : '매도'} 체결: ${trade.name} ${trade.qty}주'),
+        duration: const Duration(seconds: 2),
+      ));
+    } on ApiException catch (e) {
+      if (!mounted) return;
+      setState(() => _submitting = false);
+      messenger.showSnackBar(
+          SnackBar(content: Text(e.message), duration: const Duration(seconds: 2)));
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final fmt = NumberFormat('#,###');
@@ -338,16 +374,13 @@ class _OrderSheetState extends State<_OrderSheet> {
                 backgroundColor: color,
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                 padding: const EdgeInsets.symmetric(vertical: 14)),
-            onPressed: () {
-              Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                content: Text(
-                    '${widget.isBuy ? '매수' : '매도'} 주문 완료 (Mock): ${widget.name} $_qty주'),
-                duration: const Duration(seconds: 2),
-              ));
-            },
-            child: Text(widget.isBuy ? '매수 주문' : '매도 주문',
-                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+            onPressed: _submitting ? null : _submit,
+            child: _submitting
+                ? const SizedBox(
+                    width: 20, height: 20,
+                    child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                : Text(widget.isBuy ? '매수 주문' : '매도 주문',
+                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
           ),
         ],
       ),
