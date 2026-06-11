@@ -5,6 +5,8 @@ import 'package:growant/core/api/api_exception.dart';
 import 'package:growant/features/account/application/account_providers.dart';
 import 'package:growant/features/account/data/account_models.dart';
 import 'package:growant/features/account/data/account_repository.dart';
+import 'package:growant/features/auth/application/auth_providers.dart';
+import 'package:growant/features/auth/data/auth_models.dart';
 import 'package:growant/features/home/widgets/asset_card.dart';
 
 class _FakeRepo implements AccountRepository {
@@ -22,8 +24,17 @@ class _FakeRepo implements AccountRepository {
   dynamic noSuchMethod(Invocation i) => super.noSuchMethod(i);
 }
 
+class _FakeAuth extends AuthController {
+  @override
+  Future<AuthUser?> build() async =>
+      const AuthUser(id: 1, nickname: '개미왕', provider: 'kakao');
+}
+
 Widget _wrap(AccountRepository repo) => ProviderScope(
-      overrides: [accountRepositoryProvider.overrideWithValue(repo)],
+      overrides: [
+        accountRepositoryProvider.overrideWithValue(repo),
+        authControllerProvider.overrideWith(() => _FakeAuth()),
+      ],
       child: const MaterialApp(home: Scaffold(body: AssetCard())),
     );
 
@@ -34,6 +45,7 @@ void main() {
     await tester.pump();
     expect(find.text('10,520,000원'), findsOneWidget);
     expect(find.text('+5.20%'), findsOneWidget);
+    expect(find.text('개미왕'), findsOneWidget);
   });
 
   testWidgets('로딩 중에는 스피너를 표시한다', (tester) async {

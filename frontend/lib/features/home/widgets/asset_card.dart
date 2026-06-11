@@ -6,9 +6,10 @@ import '../../../core/api/api_exception.dart';
 import '../../../core/theme.dart';
 import '../../../data/mock/mock_data.dart';
 import '../../account/application/account_providers.dart';
+import '../../auth/application/auth_providers.dart';
 
 /// 홈 자산 요약 카드 — accountSummaryProvider(GET /api/account/summary).
-/// 프로필(이름·티어)은 auth 도메인이라 mock 유지. 로딩/에러는 컴팩트 인라인.
+/// 이름은 로그인 사용자(authControllerProvider), 티어는 요금제 도메인이라 mock 유지. 로딩/에러는 컴팩트 인라인.
 class AssetCard extends ConsumerWidget {
   const AssetCard({super.key});
 
@@ -29,7 +30,7 @@ class AssetCard extends ConsumerWidget {
         children: [
           Row(
             children: [
-              Text(mockUserName,
+              Text(ref.watch(authControllerProvider).value?.nickname ?? '투자자',
                   style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
               const SizedBox(width: 8),
               _TierChip(tier: mockUserTier),
