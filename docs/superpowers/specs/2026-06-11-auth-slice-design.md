@@ -117,7 +117,7 @@ Dio createApiClient({String baseUrl = kApiBaseUrl, Future<String?> Function()? g
 - `data/auth_models.dart`: `AuthUser(id, nickname, provider)` + fromJson, `AuthResponse(token, user)` + fromJson.
 - `data/auth_repository.dart`: `login({provider, nickname})` POST `/api/auth/login`, `me()` GET `/api/auth/me` — 에러 매핑은 **추출된 공용 `asApiException`** 사용(§5).
 - `application/auth_providers.dart`: `authRepositoryProvider`, `AuthController extends AsyncNotifier<AuthUser?>`:
-  - `build()`: 저장 토큰 없으면 `null`, 있으면 `me()` 시도 — 실패(401 포함) 시 토큰 clear 후 `null`
+  - `build()`: 저장 토큰 없으면 `null`, 있으면 `me()` 시도 — 서버가 거부(401 등)하면 토큰 clear 후 `null`, 네트워크 단절(NETWORK)이면 토큰 보존 후 `null`(다음 시작 때 자동 로그인 재시도)
   - `login(provider, nickname)`: repo.login → 토큰 save → state=AsyncData(user)
   - `logout()`: 토큰 clear → state=AsyncData(null)
   - `authControllerProvider = AsyncNotifierProvider<AuthController, AuthUser?>`
@@ -193,7 +193,7 @@ market/portfolio/account/trading 4개 repo의 private `_asApiException` 제거·
 ## 8. 알려진 한계 (PR 본문 기재)
 
 - **닉네임 = 신원**: 같은 (provider, nickname)이면 같은 계정(비밀번호 없음) — 데모 의도.
-- **토큰 24h 만료 후 자동 갱신 없음**: 만료 시 401 → 다음 앱 재시작 시 AuthGate가 로그인 화면으로. 사용 중 만료의 즉시 리다이렉트는 미구현(화면별 ErrorView가 "접근 권한 없음" 표시).
+- **토큰 24h 만료 후 자동 갱신 없음**: 만료 시 401 → 다음 앱 재시작 시 AuthGate가 로그인 화면으로(만료 토큰은 clear, 네트워크 단절은 토큰 보존). 사용 중 만료의 즉시 리다이렉트는 미구현(화면별 ErrorView가 "접근 권한 없음" 표시).
 - **UserStore 휘발**: 서버 재시작 시 id 채번 초기화 — 단일 공유 거래 상태라 실영향 없음, ⑦에서 DB 이관.
 - **거래 상태는 여전히 단일 공유**: 어느 계정으로 로그인해도 같은 포트폴리오.
 
