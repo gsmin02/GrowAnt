@@ -32,11 +32,12 @@ AI와 투자 대결하는 모의투자 앱 — 초보 투자자의 매매 타이
 
 ## 사전 준비 (팀 PC)
 - JDK 21, Flutter 3.44, Docker
-- (선택) Supabase 프로젝트 — `.env`는 `.env.example` 참고해 작성
+- `.env`는 `.env.example` 참고해 작성 — DB는 docker compose의 **PostgreSQL 컨테이너**(자체 호스팅)
 
 ## 실행
 ```bash
-# 인프라 + 백엔드 + Redis
+# 인프라 + 백엔드 + Redis + PostgreSQL
+# (백엔드 Dockerfile·dev 프로파일은 영속성 슬라이스에서 정비 예정 — 현재는 아래 '백엔드 단독' 사용)
 docker compose up -d
 
 # 백엔드 단독
