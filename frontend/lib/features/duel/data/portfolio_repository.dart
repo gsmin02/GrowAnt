@@ -11,11 +11,8 @@ class PortfolioRepository {
       final res = await _dio.get('/api/portfolio/${owner.path}');
       return Portfolio.fromJson(res.data as Map<String, dynamic>);
     } on DioException catch (e) {
-      throw _asApiException(e);
+      throw asApiException(e);
     }
   }
 
-  ApiException _asApiException(DioException e) => e.error is ApiException
-      ? e.error as ApiException
-      : const ApiException(eventType: 'NETWORK', code: 'ERR_NETWORK', message: '인터넷 연결을 확인해주세요.', retryable: true);
 }
