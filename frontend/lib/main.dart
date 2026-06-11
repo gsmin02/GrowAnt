@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'app/auth_gate.dart';
 import 'core/theme.dart';
-import 'features/auth/login_screen.dart';
 
 void main() => runApp(const ProviderScope(child: GrowAntApp()));
 
@@ -15,7 +15,7 @@ class GrowAntApp extends StatelessWidget {
       title: 'GrowAnt',
       debugShowCheckedModeBanner: false,
       theme: growAntTheme(),
-      home: const LoginScreen(),
+      home: const AuthGate(),
     );
   }
 }
