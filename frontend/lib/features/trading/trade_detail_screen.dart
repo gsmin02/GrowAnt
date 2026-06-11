@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import '../../core/theme.dart';
-import '../../data/mock/mock_data.dart';
+import 'data/trade_models.dart';
 
 class TradeDetailScreen extends StatelessWidget {
   final Trade trade;

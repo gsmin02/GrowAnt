@@ -1,30 +1,49 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
+import '../../core/api/api_exception.dart';
+import '../../core/error/error_view.dart';
 import '../../core/theme.dart';
-import '../../data/mock/mock_data.dart';
+import 'application/trading_providers.dart';
+import 'data/trade_models.dart';
 import 'trade_detail_screen.dart';
 
-class TradeHistoryScreen extends StatelessWidget {
+class TradeHistoryScreen extends ConsumerWidget {
   const TradeHistoryScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final fmt = NumberFormat('#,###');
-
-    return Column(
-      children: [
-        _SummaryBar(trades: mockTrades),
-        Expanded(
-          child: ListView.separated(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            itemCount: mockTrades.length,
-            separatorBuilder: (_, __) =>
-                const Divider(height: 1, color: Color(0xFFF0F0F0)),
-            itemBuilder: (_, i) => _TradeTile(trade: mockTrades[i], fmt: fmt),
-          ),
-        ),
-      ],
+  Widget build(BuildContext context, WidgetRef ref) {
+    final async = ref.watch(tradesProvider);
+    return async.when(
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (e, _) {
+        final api = e is ApiException ? e : null;
+        return ErrorView(
+          kind: errorKindFromEventType(api?.eventType ?? 'NETWORK'),
+          message: api?.message,
+          onRetry: (api?.retryable ?? true)
+              ? () => ref.read(tradesProvider.notifier).refresh()
+              : null,
+        );
+      },
+      data: (trades) {
+        final fmt = NumberFormat('#,###');
+        return Column(
+          children: [
+            _SummaryBar(trades: trades),
+            Expanded(
+              child: ListView.separated(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                itemCount: trades.length,
+                separatorBuilder: (_, __) =>
+                    const Divider(height: 1, color: Color(0xFFF0F0F0)),
+                itemBuilder: (_, i) => _TradeTile(trade: trades[i], fmt: fmt),
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 }

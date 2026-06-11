@@ -1,15 +1,5 @@
 /// Mock 데이터 — 백엔드 연동 전 UI 개발용. 추후 repository로 교체.
 
-class Trade {
-  final String name;
-  final bool isBuy;
-  final int amount; // 체결 금액
-  final int price; // 단가
-  final int qty;
-  final String time;
-  const Trade(this.name, this.isBuy, this.amount, this.price, this.qty, this.time);
-}
-
 class DividendEvent {
   final String ticker;
   final String name;
@@ -61,16 +51,6 @@ const int mockDuelDDay = 18;
 const String mockUserName = '민지성';
 const String mockUserTier = 'Standard'; // Free / Standard / Premium
 const String mockUserEmail = 'gsmin5202@gmail.com';
-
-// ── 거래 내역 ──
-const List<Trade> mockTrades = [
-  Trade('삼성전자', false, 763000, 76300, 10, '05.10 14:32'),
-  Trade('애플', true, 504000, 252000, 2, '05.10 10:08'),
-  Trade('SK하이닉스', true, 903500, 180700, 5, '05.09 15:18'),
-  Trade('카카오', false, 412000, 41200, 10, '05.09 11:45'),
-  Trade('삼성전자', true, 720000, 72000, 10, '05.08 09:35'),
-  Trade('NAVER', false, 198400, 198400, 1, '05.07 16:01'),
-];
 
 // ── 배당금 일정 ──
 const List<DividendEvent> mockDividends = [
