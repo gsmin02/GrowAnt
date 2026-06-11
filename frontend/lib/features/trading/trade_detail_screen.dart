@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import '../../core/theme.dart';
-import '../../data/mock/mock_data.dart';
+import 'data/trade_models.dart';
 
 class TradeDetailScreen extends StatelessWidget {
   final Trade trade;
@@ -52,7 +52,7 @@ class TradeDetailScreen extends StatelessWidget {
             _InfoRow('체결 시각', trade.time),
           ]),
           const SizedBox(height: 12),
-          const Text('* Mock 데이터 — 실제 체결 내역 연동 시 대체됩니다.',
+          const Text('* 수수료는 임시 계산값 — 실제 수수료 정책 연동 시 대체됩니다.',
               style: TextStyle(color: Color(0xFFAAAAAA), fontSize: 12)),
         ],
       ),

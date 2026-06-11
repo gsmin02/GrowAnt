@@ -3,7 +3,7 @@
 ## Stack
 - Frontend: Flutter 3.44 / Dart 3 (크로스플랫폼)
 - Backend: Spring Boot 4.0.x + Kotlin (JDK 21)
-- DB: Supabase (managed PostgreSQL) — 매니지드 Postgres 용도로만 사용
+- DB: PostgreSQL (자체 호스팅 — docker compose `postgres` 컨테이너)
 - Cache / 실시간 fan-out: Redis
 - Reverse proxy: nginx
 - AI sidecar (추후): Python FastAPI (백테스터·연구)
@@ -34,11 +34,10 @@ KIS PoC 보류 → `MarketDataProvider = sim`. 랜덤워크 기반 가격 스트
 (sim 또는 KIS) → Spring `market` → Redis pub/sub → Flutter(STOMP/WebSocket).
 실시간 현재가 = Redis 캐시, DB = 1분봉 요약만.
 
-## Supabase 정합성 주의
-- 인증·접근통제 경계는 **Spring**. Supabase Auth/RLS 미사용.
-- 실시간은 Redis. Supabase Realtime 미사용.
-- 연결은 Supabase 풀러(Supavisor, 6543 트랜잭션 모드), 풀 크기 보수적.
-- 무료 티어: 1주 미사용 자동 일시정지·백업 없음·DB 500MB → 데모 전 unpause 체크.
+## PostgreSQL 운영 메모
+- 자체 호스팅(docker compose `postgres:16-alpine`, 도커 볼륨 영속) — 매니지드 무료 티어 제약(자동 일시정지·용량 한도) 없음, 오프라인 개발 가능.
+- 인증·접근통제 경계는 **Spring**. 실시간은 Redis. (DB 고유 부가기능 비의존 — 변동 없음)
+- 백업은 필요 시 `pg_dump`. 매니지드(Supabase/RDS 등) 전환은 JDBC URL 교체만으로 가능하도록 표준 Postgres 기능만 사용.
 
 ## nginx 라우팅
 `/api/**` → backend · `/ws/**` → backend(WebSocket upgrade) · `/ai/**` → 현재 backend, 추후 FastAPI 사이드카
