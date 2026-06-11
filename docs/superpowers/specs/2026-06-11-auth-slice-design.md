@@ -9,7 +9,7 @@
 **목표**
 - 데모 로그인: 소셜 버튼 탭 → 닉네임 입력 → 서버 find-or-create 가입·로그인
 - JWT 발급·검증(Spring 공식 oauth2-resource-server 자체 서명, HS256)
-- 전체 API 보호: `/api/auth/**`만 공개, 나머지는 Bearer 토큰 필수
+- 전체 API 보호: `/api/auth/login`만 공개, 나머지(me 포함)는 Bearer 토큰 필수
 - 프론트 자동 로그인(AuthGate + secure storage), 로그아웃, 프로필 표시 연동
 - 기술부채: `_asApiException` 4벌 중복을 공용 함수로 추출(5번째 복제 방지)
 
@@ -27,7 +27,7 @@
 | 토큰 | JWT (자체 서명 HS256) | 현 STATELESS 유지, 모바일 표준 |
 | 구현 방식 | **A안**: `spring-boot-starter-oauth2-resource-server` | 커스텀 필터 0개, Spring 정석 |
 | 상태 범위 | 단일 공유 상태 유지 | per-user는 ⑦에서 DB와 함께 |
-| 보호 범위 | 전체 보호(`/api/auth/**`만 공개) | 앱이 로그인 후에만 화면 진입 |
+| 보호 범위 | 전체 보호(`/api/auth/login`만 공개) | 앱이 로그인 후에만 화면 진입. me까지 보호해야 401 envelope 일관 |
 
 ## 3. 백엔드 설계
 
@@ -59,7 +59,7 @@ testImplementation("org.springframework.security:spring-security-test")
 
 ```kotlin
 .authorizeHttpRequests {
-    it.requestMatchers("/api/auth/**").permitAll()   // 기존 permitAll 5줄 전부 제거
+    it.requestMatchers("/api/auth/login").permitAll() // 기존 permitAll 5줄 전부 제거. me는 보호(클레임 필요)
     it.anyRequest().authenticated()
 }
 .oauth2ResourceServer {
