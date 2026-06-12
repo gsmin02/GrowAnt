@@ -1,7 +1,10 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/api/api_exception.dart';
 import '../../../core/api/token_storage.dart';
+import '../../account/application/account_providers.dart';
+import '../../duel/application/portfolio_providers.dart';
 import '../../market/application/market_providers.dart';
+import '../../trading/application/trading_providers.dart';
 import '../data/auth_models.dart';
 import '../data/auth_repository.dart';
 
@@ -31,11 +34,21 @@ class AuthController extends AsyncNotifier<AuthUser?> {
         await ref.read(authRepositoryProvider).login(provider: provider, nickname: nickname);
     await ref.read(tokenStorageProvider).save(res.token);
     state = AsyncValue.data(res.user);
+    _invalidateUserScopedData();
   }
 
   Future<void> logout() async {
     await ref.read(tokenStorageProvider).clear();
     state = const AsyncValue.data(null);
+    _invalidateUserScopedData();
+  }
+
+  /// 계정 전환 시 사용자 범위 데이터 캐시 무효화 — 데이터 provider는 앱 수명 캐시라
+  /// 이전 계정의 데이터(또는 옛 토큰의 401 에러)가 다음 계정 화면에 그대로 남는다(per-user 필수).
+  void _invalidateUserScopedData() {
+    ref.invalidate(portfolioProvider); // family 전체(me·ai)
+    ref.invalidate(accountSummaryProvider);
+    ref.invalidate(tradesProvider);
   }
 }
 
