@@ -298,11 +298,15 @@ class _OrderSheet extends ConsumerStatefulWidget {
 class _OrderSheetState extends ConsumerState<_OrderSheet> {
   int _qty = 1;
   bool _submitting = false;
+  String? _error;
 
   Future<void> _submit() async {
     final messenger = ScaffoldMessenger.of(context);
     final navigator = Navigator.of(context);
-    setState(() => _submitting = true);
+    setState(() {
+      _submitting = true;
+      _error = null;
+    });
     try {
       final trade = await ref
           .read(tradeRepositoryProvider)
@@ -319,9 +323,11 @@ class _OrderSheetState extends ConsumerState<_OrderSheet> {
       ));
     } on ApiException catch (e) {
       if (!mounted) return;
-      setState(() => _submitting = false);
-      messenger.showSnackBar(
-          SnackBar(content: Text(e.message), duration: const Duration(seconds: 2)));
+      // 스낵바는 모달 시트 뒤(Scaffold 하단)에 그려져 가려진다 — 실패는 시트 안 인라인으로 표시.
+      setState(() {
+        _submitting = false;
+        _error = e.message;
+      });
     }
   }
 
@@ -368,6 +374,12 @@ class _OrderSheetState extends ConsumerState<_OrderSheet> {
             Text('${fmt.format(total)}원',
                 style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
           ]),
+          if (_error != null) ...[
+            const SizedBox(height: 12),
+            Text(_error!,
+                textAlign: TextAlign.center,
+                style: const TextStyle(color: Color(0xFFD32F2F), fontSize: 13)),
+          ],
           const SizedBox(height: 20),
           FilledButton(
             style: FilledButton.styleFrom(
