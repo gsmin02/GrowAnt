@@ -48,9 +48,8 @@ const int mockSeed = 10000000;
 const int mockDuelDDay = 18;
 
 // ── 사용자 프로필 ──
-const String mockUserName = '민지성';
+// 이름·이메일은 auth 슬라이스에서 로그인 사용자로 대체됨. tier는 요금제 슬라이스에서 이전 예정.
 const String mockUserTier = 'Standard'; // Free / Standard / Premium
-const String mockUserEmail = 'gsmin5202@gmail.com';
 
 // ── 배당금 일정 ──
 const List<DividendEvent> mockDividends = [

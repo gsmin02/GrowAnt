@@ -5,12 +5,26 @@ import 'api_exception.dart';
 const String kApiBaseUrl =
     String.fromEnvironment('API_BASE_URL', defaultValue: 'http://localhost:8080');
 
-Dio createApiClient({String baseUrl = kApiBaseUrl}) {
+Dio createApiClient({String baseUrl = kApiBaseUrl, Future<String?> Function()? getToken}) {
   final dio = Dio(BaseOptions(
     baseUrl: baseUrl,
     connectTimeout: const Duration(seconds: 5),
     receiveTimeout: const Duration(seconds: 5),
   ));
+  // 인증 토큰 부착 — 주입된 경우에만(테스트·비로그인 경로 영향 0). 스펙 §4.3
+  if (getToken != null) {
+    dio.interceptors.add(InterceptorsWrapper(
+      onRequest: (options, handler) async {
+        try {
+          final token = await getToken();
+          if (token != null) options.headers['Authorization'] = 'Bearer $token';
+        } catch (_) {
+          // 토큰 읽기 실패(Keychain 등) — 헤더 없이 진행하면 서버가 401 envelope로 응답한다.
+        }
+        handler.next(options);
+      },
+    ));
+  }
   dio.interceptors.add(InterceptorsWrapper(
     onResponse: (response, handler) {
       final data = response.data;

@@ -1,10 +1,13 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/api/api_client.dart';
+import '../../../core/api/token_storage.dart';
 import '../data/market_models.dart';
 import '../data/market_repository.dart';
 
-final dioProvider = Provider<Dio>((ref) => createApiClient());
+final dioProvider = Provider<Dio>(
+  (ref) => createApiClient(getToken: () => ref.read(tokenStorageProvider).read()),
+);
 
 final marketRepositoryProvider =
     Provider<MarketRepository>((ref) => MarketRepository(ref.watch(dioProvider)));
