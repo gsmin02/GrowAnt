@@ -138,7 +138,13 @@ class AccountScreen extends ConsumerWidget {
         _MenuItem(
           icon: Icons.logout,
           label: '로그아웃',
-          onTap: () => ref.read(authControllerProvider.notifier).logout(),
+          onTap: () async {
+            // 루트 messenger를 먼저 캡처 — logout 후 이 화면은 AuthGate에 의해 언마운트된다.
+            final messenger = ScaffoldMessenger.of(context);
+            await ref.read(authControllerProvider.notifier).logout();
+            messenger.showSnackBar(const SnackBar(
+                content: Text('로그아웃 되었습니다.'), duration: Duration(seconds: 2)));
+          },
         ),
         ],
       ),

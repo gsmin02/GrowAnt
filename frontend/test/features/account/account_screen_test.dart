@@ -40,7 +40,9 @@ void main() {
     await tester.pump();
     await tester.ensureVisible(find.text('로그아웃'));
     await tester.tap(find.text('로그아웃'));
-    await tester.pump();
+    await tester.pump(); // logout future resolve
+    await tester.pump(); // 스낵바 프레임
     expect(fake.loggedOut, isTrue);
+    expect(find.text('로그아웃 되었습니다.'), findsOneWidget);
   });
 }
