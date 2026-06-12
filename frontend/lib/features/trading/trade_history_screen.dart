@@ -28,6 +28,12 @@ class TradeHistoryScreen extends ConsumerWidget {
         );
       },
       data: (trades) {
+        if (trades.isEmpty) {
+          return const Center(
+            child: Text('거래 내역이 없습니다',
+                style: TextStyle(color: Color(0xFF888888), fontSize: 14)),
+          );
+        }
         final fmt = NumberFormat('#,###');
         return Column(
           children: [
