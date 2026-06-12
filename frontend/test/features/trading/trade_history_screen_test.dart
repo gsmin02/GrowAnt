@@ -15,12 +15,13 @@ const _trades = [
 
 class _FakeRepo implements TradeRepository {
   final Object? error;
-  _FakeRepo({this.error});
+  final List<Trade> trades;
+  _FakeRepo({this.error, this.trades = _trades});
 
   @override
   Future<List<Trade>> fetchTrades() async {
     if (error != null) throw error!;
-    return _trades;
+    return trades;
   }
 
   @override
@@ -74,5 +75,12 @@ void main() {
     await tester.pump();
     expect(find.byType(ErrorView), findsOneWidget);
     expect(find.widgetWithText(FilledButton, '다시 시도'), findsNothing);
+  });
+
+  testWidgets('내역이 없으면 빈 상태 문구를 표시한다', (tester) async {
+    await tester.pumpWidget(_wrap(_FakeRepo(trades: const [])));
+    await tester.pump();
+    expect(find.text('거래 내역이 없습니다'), findsOneWidget);
+    expect(find.text('총 매수'), findsNothing); // 요약 바 생략
   });
 }

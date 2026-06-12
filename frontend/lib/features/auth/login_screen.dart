@@ -87,6 +87,7 @@ class _NicknameSheet extends ConsumerStatefulWidget {
 class _NicknameSheetState extends ConsumerState<_NicknameSheet> {
   final _controller = TextEditingController();
   bool _submitting = false;
+  String? _error;
 
   @override
   void dispose() {
@@ -97,24 +98,28 @@ class _NicknameSheetState extends ConsumerState<_NicknameSheet> {
   Future<void> _submit() async {
     final nickname = _controller.text.trim();
     if (nickname.isEmpty) return;
-    final messenger = ScaffoldMessenger.of(context);
     final navigator = Navigator.of(context);
-    setState(() => _submitting = true);
+    setState(() {
+      _submitting = true;
+      _error = null;
+    });
     try {
       await ref.read(authControllerProvider.notifier).login(widget.provider, nickname);
       if (mounted) navigator.pop();
     } on ApiException catch (e) {
       if (!mounted) return;
-      setState(() => _submitting = false);
-      messenger.showSnackBar(
-          SnackBar(content: Text(e.message), duration: const Duration(seconds: 2)));
+      // 스낵바는 모달 시트 뒤(Scaffold 하단)에 그려져 가려진다 — 실패는 시트 안 인라인으로 표시.
+      setState(() {
+        _submitting = false;
+        _error = e.message;
+      });
     } catch (_) {
       // 토큰 저장(Keychain) 등 비API 예외 — 버튼이 영구 비활성으로 남지 않게 복구한다.
       if (!mounted) return;
-      setState(() => _submitting = false);
-      messenger.showSnackBar(const SnackBar(
-          content: Text('로그인에 실패했어요. 다시 시도해 주세요.'),
-          duration: Duration(seconds: 2)));
+      setState(() {
+        _submitting = false;
+        _error = '로그인에 실패했어요. 다시 시도해 주세요.';
+      });
     }
   }
 
@@ -141,6 +146,12 @@ class _NicknameSheetState extends ConsumerState<_NicknameSheet> {
                 labelText: '닉네임', border: OutlineInputBorder(), counterText: ''),
             onSubmitted: (_) => _submitting ? null : _submit(),
           ),
+          if (_error != null) ...[
+            const SizedBox(height: 8),
+            Text(_error!,
+                textAlign: TextAlign.center,
+                style: const TextStyle(color: Color(0xFFD32F2F), fontSize: 13)),
+          ],
           const SizedBox(height: 16),
           FilledButton(
             style: FilledButton.styleFrom(
