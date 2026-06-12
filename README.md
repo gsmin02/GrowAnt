@@ -32,15 +32,15 @@ AI와 투자 대결하는 모의투자 앱 — 초보 투자자의 매매 타이
 
 ## 사전 준비 (팀 PC)
 - JDK 21, Flutter 3.44, Docker
-- `.env`는 `.env.example` 참고해 작성 — DB는 docker compose의 **PostgreSQL 컨테이너**(자체 호스팅)
+- `.env`는 `.env.example` 참고해 작성(선택 — 없으면 dev 기본값으로 동작) — DB는 docker compose의 **PostgreSQL 컨테이너**(자체 호스팅, 데이터는 도커 볼륨에 영속)
 
 ## 실행
 ```bash
-# 인프라 + 백엔드 + Redis + PostgreSQL
-# (백엔드 Dockerfile·dev 프로파일은 영속성 슬라이스에서 정비 예정 — 현재는 아래 '백엔드 단독' 사용)
-docker compose up -d
+# 전체 스택 (nginx + 백엔드 + Redis + PostgreSQL)
+docker compose up --build -d
 
-# 백엔드 단독 (local 프로파일 — DB 불필요. 루트 .env가 있으면 자동 로드)
+# 백엔드 단독 (local 프로파일 — DB는 compose의 postgres 사용)
+docker compose up -d postgres
 cd backend && ./gradlew bootRun --args='--spring.profiles.active=local'
 
 # 프론트 — API 주소는 frontend/.env로 관리
