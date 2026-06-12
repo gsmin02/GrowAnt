@@ -106,7 +106,7 @@ fun placeOrder(userId: Long, ticker: String, isBuy: Boolean, qty: Int): TradeDto
 
 ### 6.2 AuthService — find-or-create를 DB로, 가입 시드 지급
 
-- `UserStore` 삭제 → `@Transactional login()`: `findByProviderAndNickname` ?: `save(UserEntity(cash = INITIAL_CASH))`. 동시 가입은 유니크 충돌(`DataIntegrityViolationException`) catch 후 재조회 — 멱등.
+- `UserStore` 삭제 → `login()`: `findByProviderAndNickname` ?: `save(UserEntity(cash = INITIAL_CASH))`. 동시 가입은 유니크 충돌(`DataIntegrityViolationException`) catch 후 재조회 — 멱등. **login에 바깥 `@Transactional`을 두지 않는다**: PostgreSQL은 제약 위반 시 트랜잭션을 중단시켜 같은 트랜잭션 내 재조회가 불가 — 각 repo 호출의 자체 트랜잭션으로 충분(쓰기 1회).
 - JWT 발급·검증·클레임·`me`(클레임 기반, DB 조회 없음)는 무변경.
 
 ### 6.3 AccountService — 원자 요약
